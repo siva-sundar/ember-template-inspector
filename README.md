@@ -2,6 +2,8 @@
 
 An ember add-on which opens the template file in the code editor while inspecting an element. To open the file, `Press ALT(Option) + SHIFT and Click on the element`.
 
+[![Watch the video](https://i.ytimg.com/vi/erxZqbvrCCo/maxresdefault.jpg)](https://youtu.be/erxZqbvrCCo)
+
 ### How this works ?
 File locations are added to the html elements during development build and on clicking the element, an api is initiated to the express server which opens the file.
 
