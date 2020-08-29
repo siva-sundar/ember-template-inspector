@@ -45,7 +45,7 @@ template-inspectorrc.json (Please add this to your .gitignore file as this is a 
 ### Installation
 
 ```
-ember install my-addon
+ember install ember-template-inspector
 ```
 
 ### Development
