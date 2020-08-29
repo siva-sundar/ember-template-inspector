@@ -18,9 +18,14 @@ module.exports = {
     'plugin:ember/recommended'
   ],
   env: {
-    browser: true
+    browser: true,
+    node: true
   },
-  rules: {},
+  rules: {
+    "node/no-unpublished-require": ["error", {
+      "allowModules": ["ember-cli"]
+    }]
+  },
   overrides: [
     // node files
     {
