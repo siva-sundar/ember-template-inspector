@@ -1,7 +1,14 @@
-<h1 id="title" data-test-title="addon-title">Ember Tempalate Inspector</h1>
+<h1 id="title" data-test-title="addon-title">Ember Template Inspector</h1>
 <hr>
 <h2 data-test-title="application-route"> Application Route </h2>
-{{#link-to "parent"}}
-  Go to Route
+{{#link-to "classic-route"}}
+  Go to Classic Route
 {{/link-to}}
+&nbsp;&nbsp;&nbsp;
+{{#link-to "pod-route"}}
+  Go to Pod Route
+{{/link-to}}
+<br />
+<br />
+<br />
 {{outlet}}
