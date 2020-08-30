@@ -43,12 +43,8 @@ module.exports = {
       let { file } = req.query;
       let [modulePrefix] = file.split('/');
       let modulePath = moduleRootPaths[modulePrefix];
+      file = file.replace(`${modulePrefix}/`, '');
 
-      if (file.match(/.*templates\//)) {
-        file = file.replace(/.*templates\//, 'templates/');
-      } else if (file.match(/.*components\//, 'components/')) {
-        file = file.replace(/.*components\//, 'components/');
-      }
 
       let [fileName, line, column] = file.split(':');
       let filePath = path.join(modulePath, fileName);

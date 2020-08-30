@@ -12,13 +12,22 @@ module('Acceptance | inspector', function(hooks) {
     assert.dom('[data-test-title="addon-title"]').hasAttribute('data-loc', 'dummy/templates/application.hbs:1:0');
     assert.dom('[data-test-title="application-route"]').hasAttribute('data-loc', 'dummy/templates/application.hbs:3:0');
 
-    await click('[href="/parent"]');
+    await click('[href="/classic-route"]');
 
-    //Parent route
-    assert.dom('[data-test-title="Route-title"]').hasAttribute('data-loc', 'dummy/templates/parent.hbs:2:2');
-    assert.dom('[data-test-title="container"]').hasAttribute('data-loc', 'dummy/templates/parent.hbs:7:0');
+    //classic route
+    assert.dom('[data-test-title="classic-route-title"]').hasAttribute('data-loc', 'dummy/templates/classic-route.hbs:2:2');
+    assert.dom('[data-test-title="container"]').hasAttribute('data-loc', 'dummy/templates/classic-route.hbs:7:0');
 
-    //my component
-    assert.dom('[data-test-title="my-component"]').hasAttribute('data-loc', 'dummy/components/my-component.hbs:1:0')
+    //classic component
+    assert.dom('[data-test-title="classic-component"]').hasAttribute('data-loc', 'dummy/components/classic-component.hbs:1:0')
+
+
+    //pod route
+    await click('[href="/pod-route"]');
+    assert.dom('[data-test-title="pod-route-title"]').hasAttribute('data-loc', 'dummy/pod-route/template.hbs:2:2');
+    assert.dom('[data-test-title="container"]').hasAttribute('data-loc', 'dummy/pod-route/template.hbs:6:0');
+
+    //pod component
+    assert.dom('[data-test-title="pod-component"]').hasAttribute('data-loc', 'dummy/components/pod-component/template.hbs:1:0')
   });
 });

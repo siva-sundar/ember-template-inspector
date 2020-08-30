@@ -6,7 +6,12 @@ body {
   padding: 5px;
 }
 
-.my-component {
+.classic-component {
+  border: 2px solid grey;
+  padding: 20px 10px;
+}
+
+.pod-component {
   border: 2px solid grey;
   padding: 20px 10px;
 }
