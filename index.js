@@ -4,27 +4,34 @@ const { yellow, red } = require('chalk');
 const fs = require('fs');
 const path = require('path');
 const FileNamePlugin = require('./lib/file-name-plugin')();
-const runEditorCMD = require('./lib/run-editor-cmd');
-const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const supportedEditors = require('./lib/supported-editors');
 
-const isDevelopment = EmberApp.env() === 'development';
+const editors = Object.keys(supportedEditors);
+const processDir = process.cwd()
+const preferencePath = path.join(processDir, 'template-inspectorrc.json');
+const isConfigFileExists = fs.existsSync(preferencePath);
 
-const currentDir = process.cwd()
-const preferencePath = path.join(currentDir, 'template-inspectorrc.json');
-const projectFolderName = currentDir.split('/').pop();
+let inspectorOptions, editor, serverUrl;
 
+function validateAndLoadConfig() {
 
-let isInspectorEnabled, editor, serverUrl;
+  if (isConfigFileExists && !inspectorOptions) {
+    let content = fs.readFileSync(preferencePath, 'utf-8');
+    inspectorOptions = JSON.parse(content);
+    editor = inspectorOptions.editor;
 
-if (fs.existsSync(preferencePath)) {
-  let content = fs.readFileSync(preferencePath, 'utf-8');
-  ({ editor, enabled: isInspectorEnabled } = JSON.parse(content));
-} else if (isDevelopment && !process.env.CI) {
+    if (!supportedEditors[editor]) {
+      throw new Error(`Editor not supported, please specify one of the following in template-inspectorrc.json \n *${editors.join('\n *')}`);
+    }
+  } else {
+    let projectRoot = processDir.split('/').pop();
+    let message = red(`\nKindly create a file ${yellow("'template-inspectorrc.json'")} under ${yellow(projectRoot + '/')} folder with the following config to use ember-template-inspector\n`);
 
-  console.log(red(`Kindly create a file 'template-inspectorrc.json' under ${projectFolderName} folder with the following config to use ember-template-inspector`));
-  console.log(yellow(JSON.stringify({ enabled: true, editor: 'atom or vscode '}, null, 2)));
+    message += yellow(JSON.stringify({ enabled: true, editor: editors.join(' or ') }, null, 2));
 
-  process.exit(1); //eslint-disable-line
+    throw new Error(message);
+  }
+
 }
 
 
@@ -34,6 +41,10 @@ module.exports = {
   name: require('./package').name,
 
   serverMiddleware(config) {
+    if (!(inspectorOptions && inspectorOptions.enabled)) {
+      return;
+    }
+
     let options = config.options;
 
     let protocol = options.ssl === true ? 'https' : 'http';
@@ -51,7 +62,11 @@ module.exports = {
 
       try {
         if (fs.existsSync(filePath)) {
-          runEditorCMD({ filePath, line, column, editor });
+          supportedEditors[editor]({
+            filePath,
+            line,
+            column
+          });
           res.send('File opened');
         } else {
           next(new Error('File not found'));
@@ -63,10 +78,13 @@ module.exports = {
   },
 
   isEnabled() {
-    return isDevelopment && isInspectorEnabled && !process.env.CI;
+    return this.app.env === 'development' && !process.env.CI;
   },
 
   _setupPreprocessorRegistry(app) {
+    if (!(inspectorOptions && inspectorOptions.enabled)) {
+      return;
+    }
     let { registry } = app;
     let { parent } = this;
     let { root, pkg } = parent;
@@ -74,7 +92,7 @@ module.exports = {
     let { options } = this._findHost();
 
     if (options.name === app.name && options.trees.app === 'tests/dummy/app') {
-      moduleRootPaths['dummy'] = `${currentDir}/tests/dummy/app`;
+      moduleRootPaths['dummy'] = `${processDir}/tests/dummy/app`;
     } else {
       let name = typeof parent.name === 'function' ? parent.name() : parent.name;
       moduleRootPaths[name] = keywords.includes('ember-addon') ? `${root}/addon` : `${root}/app`;
@@ -91,12 +109,22 @@ module.exports = {
 
   included(app) {
     this._super.included.apply(this, arguments);
+    if (this.app.env === 'development' && !process.env.CI) {
+      validateAndLoadConfig();
+    }
     this._setupPreprocessorRegistry(app);
   },
 
+  treeFor() {
 
+    if (!(inspectorOptions && inspectorOptions.enabled)) {
+      return;
+    }
+
+    return this._super.treeFor.call(this, ...arguments);
+  },
   contentFor(type) {
-    if (type === 'head') {
+    if (type === 'head' && inspectorOptions && inspectorOptions.enabled && serverUrl) {
       return `<script>window.emberTemplateInspector = { serverUrl: '${serverUrl}' }</script>`
     }
   }
