@@ -37,7 +37,7 @@ template-inspectorrc.json (Please add this to your .gitignore file as this is a 
 
 ```
 {
-  editor: 'atom|atom-beta|vscode|vscode-insiders |vim' (any one),
+  editor: 'atom|atom-beta|vscode|vscode-insiders |vim|emacs' (any one),
   enabled: true
 }
 ```
