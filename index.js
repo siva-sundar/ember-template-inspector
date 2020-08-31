@@ -14,8 +14,7 @@ const isConfigFileExists = fs.existsSync(preferencePath);
 let inspectorOptions, editor, serverUrl;
 
 function validateAndLoadConfig() {
-
-  if (isConfigFileExists && !inspectorOptions) {
+  if (isConfigFileExists) {
     let content = fs.readFileSync(preferencePath, 'utf-8');
     inspectorOptions = JSON.parse(content);
     editor = inspectorOptions.editor;
@@ -78,7 +77,8 @@ module.exports = {
   },
 
   isEnabled() {
-    return this.app.env === 'development' && !process.env.CI;
+    let app = this._findHost();
+    return app.env === 'development' && !process.env.CI;
   },
 
   _setupPreprocessorRegistry(app) {
@@ -109,7 +109,9 @@ module.exports = {
 
   included(app) {
     this._super.included.apply(this, arguments);
-    if (this.app.env === 'development' && !process.env.CI) {
+    let _app = this._findHost();
+
+    if (_app.env === 'development' && !process.env.CI && !inspectorOptions) {
       validateAndLoadConfig();
     }
     this._setupPreprocessorRegistry(app);
