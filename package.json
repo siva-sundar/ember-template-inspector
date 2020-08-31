@@ -1,6 +1,6 @@
 {
   "name": "ember-template-inspector",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An ember add-on which opens the template file in the code editor while inspecting an element.",
   "keywords": [
     "ember-addon"
