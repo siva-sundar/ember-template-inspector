@@ -1,36 +1,33 @@
 'use strict';
+/*eslint no-useless-catch: "off"*/
 
-const { yellow, red } = require('chalk');
+const { yellow } = require('chalk');
 const fs = require('fs');
 const path = require('path');
 const FileNamePlugin = require('./lib/file-name-plugin')();
 const supportedEditors = require('./lib/supported-editors');
 
 const editors = Object.keys(supportedEditors);
-const processDir = process.cwd()
+const processDir = process.cwd();
 const preferencePath = path.join(processDir, 'template-inspectorrc.json');
 const isConfigFileExists = fs.existsSync(preferencePath);
 
-let inspectorOptions, editor, serverUrl;
+let isInspectorEnabled = true;
+let editor = 'vscode';
+
+let serverUrl;
 
 function validateAndLoadConfig() {
   if (isConfigFileExists) {
     let content = fs.readFileSync(preferencePath, 'utf-8');
-    inspectorOptions = JSON.parse(content);
+    let inspectorOptions = JSON.parse(content);
     editor = inspectorOptions.editor;
+    isInspectorEnabled = inspectorOptions.enabled;
 
     if (!supportedEditors[editor]) {
-      console.warn(`Editor not supported, please specify one of the following in template-inspectorrc.json \n *${editors.join('\n *')}`);
+      console.warn(yellow(`Editor not supported, please specify one of the following in template-inspectorrc.json \n *${editors.join('\n *')}`));
     }
-  } else {
-    let projectRoot = processDir.split('/').pop();
-    let message = red(`\nKindly create a file ${yellow("'template-inspectorrc.json'")} under ${yellow(projectRoot + '/')} folder with the following config to use ember-template-inspector\n`);
-
-    message += yellow(JSON.stringify({ enabled: true, editor: editors.join(' or ') }, null, 2));
-
-    console.warn(message);
   }
-
 }
 
 
@@ -40,7 +37,7 @@ module.exports = {
   name: require('./package').name,
 
   serverMiddleware(config) {
-    if (!(inspectorOptions && inspectorOptions.enabled)) {
+    if (!isInspectorEnabled) {
       return;
     }
 
@@ -82,7 +79,7 @@ module.exports = {
   },
 
   _setupPreprocessorRegistry(app) {
-    if (!(inspectorOptions && inspectorOptions.enabled)) {
+    if (!isInspectorEnabled) {
       return;
     }
     let { registry } = app;
@@ -111,22 +108,26 @@ module.exports = {
     this._super.included.apply(this, arguments);
     let _app = this._findHost();
 
-    if (_app.env === 'development' && !process.env.CI && !inspectorOptions) {
-      validateAndLoadConfig();
+    if (_app.env === 'development' && !process.env.CI && !isInspectorEnabled) {
+      try {
+        validateAndLoadConfig();
+      } catch(e) {
+        throw e;
+      }
     }
     this._setupPreprocessorRegistry(app);
   },
 
   treeFor() {
 
-    if (!(inspectorOptions && inspectorOptions.enabled)) {
+    if (!isInspectorEnabled) {
       return;
     }
 
     return this._super.treeFor.call(this, ...arguments);
   },
   contentFor(type) {
-    if (type === 'head' && inspectorOptions && inspectorOptions.enabled && serverUrl) {
+    if (type === 'head' && isInspectorEnabled && serverUrl) {
       return `<script>window.emberTemplateInspector = { serverUrl: '${serverUrl}' }</script>`
     }
   }

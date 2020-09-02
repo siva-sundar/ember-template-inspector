@@ -29,15 +29,16 @@ Make sure to install shell command/command line for the respective editors.
 1. From the editor, Press Cmd + Shift + P
 2. Search for Shell Command: Install ‘code’ command in PATH and choose the option.
 
-### Usage
+### Default config
 
-Create a file 'template-inspectorrc.json' in root project folder with the following config to use ember-template-inspector
+* The inspector is enabled by default
+* Default editor is `vscode`.
 
-template-inspectorrc.json (Please add this to your .gitignore file as this is a developer preference)
+To modify, please create a file `template-inspectorrc.json`(add it to .gitignore) under the project root folder with the following config.
 
 ```
 {
-  editor: 'atom|atom-beta|vscode|vscode-insiders |vim' (any one),
+  editor: 'atom | atom-beta | vscode | vscode-insiders | vim' (anyone),
   enabled: true
 }
 ```
@@ -55,8 +56,6 @@ ember install ember-template-inspector
 * `yarn`
 
 ### Works with
-* Ember.js v3.12 or above
-* Ember CLI v2.13 or above
 * Node.js v10 or above
 
 
