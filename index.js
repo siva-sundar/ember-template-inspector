@@ -20,7 +20,7 @@ function validateAndLoadConfig() {
     editor = inspectorOptions.editor;
 
     if (!supportedEditors[editor]) {
-      throw new Error(`Editor not supported, please specify one of the following in template-inspectorrc.json \n *${editors.join('\n *')}`);
+      console.warn(`Editor not supported, please specify one of the following in template-inspectorrc.json \n *${editors.join('\n *')}`);
     }
   } else {
     let projectRoot = processDir.split('/').pop();
@@ -28,7 +28,7 @@ function validateAndLoadConfig() {
 
     message += yellow(JSON.stringify({ enabled: true, editor: editors.join(' or ') }, null, 2));
 
-    throw new Error(message);
+    console.warn(message);
   }
 
 }
