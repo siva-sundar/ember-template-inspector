@@ -1,12 +1,10 @@
 'use strict';
 
-const { yellow, red } = require('chalk');
 const fs = require('fs');
 const path = require('path');
+const launch = require('launch-editor');
 const FileNamePlugin = require('./lib/file-name-plugin')();
-const supportedEditors = require('./lib/supported-editors');
 
-const editors = Object.keys(supportedEditors);
 const processDir = process.cwd()
 const preferencePath = path.join(processDir, 'template-inspectorrc.json');
 const isConfigFileExists = fs.existsSync(preferencePath);
@@ -18,21 +16,8 @@ function validateAndLoadConfig() {
     let content = fs.readFileSync(preferencePath, 'utf-8');
     inspectorOptions = JSON.parse(content);
     editor = inspectorOptions.editor;
-
-    if (!supportedEditors[editor]) {
-      console.warn(`Editor not supported, please specify one of the following in template-inspectorrc.json \n *${editors.join('\n *')}`);
-    }
-  } else {
-    let projectRoot = processDir.split('/').pop();
-    let message = red(`\nKindly create a file ${yellow("'template-inspectorrc.json'")} under ${yellow(projectRoot + '/')} folder with the following config to use ember-template-inspector\n`);
-
-    message += yellow(JSON.stringify({ enabled: true, editor: editors.join(' or ') }, null, 2));
-
-    console.warn(message);
   }
-
 }
-
 
 const moduleRootPaths = {};
 
@@ -55,17 +40,19 @@ module.exports = {
       let modulePath = moduleRootPaths[modulePrefix];
       file = file.replace(`${modulePrefix}/`, '');
 
-
       let [fileName, line, column] = file.split(':');
       let filePath = path.join(modulePath, fileName);
 
       try {
         if (fs.existsSync(filePath)) {
-          supportedEditors[editor]({
-            filePath,
-            line,
-            column
-          });
+          // If editor is specified in the config, it will try to load it first.
+          // Else, it will load any running editor.
+          // If there is no running editor, it will fallback to process.env.EDITOR
+          launch(
+            `${filePath}:${line}:${column}`,
+            editor
+          );
+
           res.send('File opened');
         } else {
           next(new Error('File not found'));
