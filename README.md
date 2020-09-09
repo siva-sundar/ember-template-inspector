@@ -6,7 +6,7 @@ An ember add-on which opens the template file in the code editor while inspectin
 [![Watch the video](https://i.ytimg.com/vi/erxZqbvrCCo/maxresdefault.jpg)](https://youtu.be/erxZqbvrCCo)
 
 ### How this works ?
-File locations are added to the html elements during development build and on clicking the element, an api is initiated to the express server which opens the file.
+File locations are added to the html elements during development build and on clicking the element, an api is initiated to the express server which opens the file. This package adds the dev server url to the index.html.
 
 
 ### Supported editors
@@ -39,8 +39,8 @@ template-inspectorrc.json (Please add this to your .gitignore file as this is a 
 
 ```
 {
-  editor: 'atom|atom-beta|vscode|vscode-insiders |vim' (any preferred editor, this addon will automatically open a running editor if this is not specified),
-  enabled: true
+  editor: any preferred editor mentioned above, this addon will automatically open a running editor if this is not specified,
+  enabled: true | false (true by default)
 }
 ```
 

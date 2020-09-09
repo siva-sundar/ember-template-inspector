@@ -9,13 +9,15 @@ const processDir = process.cwd()
 const preferencePath = path.join(processDir, 'template-inspectorrc.json');
 const isConfigFileExists = fs.existsSync(preferencePath);
 
-let inspectorOptions, editor, serverUrl;
+let serverUrl, editor;
+let isInspectorEnabled = true;
 
 function validateAndLoadConfig() {
   if (isConfigFileExists) {
     let content = fs.readFileSync(preferencePath, 'utf-8');
-    inspectorOptions = JSON.parse(content);
+    let inspectorOptions = JSON.parse(content);
     editor = inspectorOptions.editor;
+    isInspectorEnabled = inspectorOptions.enabled;
   }
 }
 
@@ -25,7 +27,7 @@ module.exports = {
   name: require('./package').name,
 
   serverMiddleware(config) {
-    if (!(inspectorOptions && inspectorOptions.enabled)) {
+    if (!isInspectorEnabled) {
       return;
     }
 
@@ -69,7 +71,7 @@ module.exports = {
   },
 
   _setupPreprocessorRegistry(app) {
-    if (!(inspectorOptions && inspectorOptions.enabled)) {
+    if (!isInspectorEnabled) {
       return;
     }
     let { registry } = app;
@@ -98,7 +100,7 @@ module.exports = {
     this._super.included.apply(this, arguments);
     let _app = this._findHost();
 
-    if (_app.env === 'development' && !process.env.CI && !inspectorOptions) {
+    if (_app.env === 'development' && !process.env.CI) {
       validateAndLoadConfig();
     }
     this._setupPreprocessorRegistry(app);
@@ -106,14 +108,14 @@ module.exports = {
 
   treeFor() {
 
-    if (!(inspectorOptions && inspectorOptions.enabled)) {
+    if (!isInspectorEnabled) {
       return;
     }
 
     return this._super.treeFor.call(this, ...arguments);
   },
   contentFor(type) {
-    if (type === 'head' && inspectorOptions && inspectorOptions.enabled && serverUrl) {
+    if (type === 'head' && isInspectorEnabled && serverUrl) {
       return `<script>window.emberTemplateInspector = { serverUrl: '${serverUrl}' }</script>`
     }
   }
