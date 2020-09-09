@@ -8,26 +8,28 @@ An ember add-on which opens the template file in the code editor while inspectin
 ### How this works ?
 File locations are added to the html elements during development build and on clicking the element, an api is initiated to the express server which opens the file.
 
+
 ### Supported editors
 
-* Atom
-* Atom beta
-* VS code
-* VS code insiders
-* VIM
-
-If you are using any other editors, please raise an issue.
-
-### Prerequisite for certain editors
-Make sure to install shell command/command line for the respective editors.
-
-**Atom**
-1. From the editor, Press Cmd + Shift + P
-2. Search for Window: Install Shell Commands and choose the option
-
-**VS CODE**
-1. From the editor, Press Cmd + Shift + P
-2. Search for Shell Command: Install ‘code’ command in PATH and choose the option.
+| Value | Editor | Linux | Windows | OSX |
+|--------|------|:------:|:------:|:------:|
+| `appcode` | [AppCode](https://www.jetbrains.com/objc/) |  |  |✓|
+| `atom` | [Atom](https://atom.io/) |✓|✓|✓|
+| `atom-beta` | [Atom Beta](https://atom.io/beta) |  |  |✓|
+| `brackets` | [Brackets](http://brackets.io/) |✓|✓|✓|
+| `clion` | [Clion](https://www.jetbrains.com/clion/) |  |✓|✓|
+| `code` | [Visual Studio Code](https://code.visualstudio.com/) |✓|✓|✓|
+| `code-insiders` | [Visual Studio Code Insiders](https://code.visualstudio.com/insiders/) |✓|✓|✓|
+| `emacs` | [Emacs](https://www.gnu.org/software/emacs/) |✓| | |
+| `idea` | [IDEA](https://www.jetbrains.com/idea/) |✓|✓|✓|
+| `notepad++` | [Notepad++](https://notepad-plus-plus.org/download/v7.5.4.html) | |✓| |
+| `pycharm` | [PyCharm](https://www.jetbrains.com/pycharm/) |✓|✓|✓|
+| `phpstorm` | [PhpStorm](https://www.jetbrains.com/phpstorm/) |✓|✓|✓|
+| `rubymine` | [RubyMine](https://www.jetbrains.com/ruby/) |✓|✓|✓|
+| `sublime` | [Sublime Text](https://www.sublimetext.com/) |✓|✓|✓|
+| `vim` | [Vim](http://www.vim.org/) |✓| | |
+| `visualstudio` | [Visual Studio](https://www.visualstudio.com/vs/) | | |✓|
+| `webstorm` | [WebStorm](https://www.jetbrains.com/webstorm/) |✓|✓|✓|
 
 ### Usage
 
@@ -37,7 +39,7 @@ template-inspectorrc.json (Please add this to your .gitignore file as this is a 
 
 ```
 {
-  editor: 'atom|atom-beta|vscode|vscode-insiders |vim' (any one),
+  editor: 'atom|atom-beta|vscode|vscode-insiders |vim' (any preferred editor, this addon will automatically open a running editor if this is not specified),
   enabled: true
 }
 ```
