@@ -65,11 +65,6 @@ module.exports = {
     });
   },
 
-  isEnabled() {
-    let app = this._findHost();
-    return app.env === 'development' && !process.env.CI;
-  },
-
   _setupPreprocessorRegistry(app) {
     if (!isInspectorEnabled) {
       return;
@@ -102,6 +97,8 @@ module.exports = {
 
     if (_app.env === 'development' && !process.env.CI) {
       validateAndLoadConfig();
+    } else {
+      isInspectorEnabled = _app.env === 'test' && this.isDevelopingAddon();
     }
     this._setupPreprocessorRegistry(app);
   },

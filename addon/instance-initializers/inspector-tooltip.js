@@ -56,7 +56,7 @@ function attachMouseOutListener($tooltip) {
 }
 
 function attachClickListener($tooltip) {
-  let { serverUrl } = window.emberTemplateInspector;
+  let { serverUrl } = window.emberTemplateInspector || {};
 
   document.body.addEventListener('click', (event) => {
     let { target } = event;
