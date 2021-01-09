@@ -5,7 +5,7 @@ export default function() {
     init() {
       this._super(...arguments);
       if (this.tagName !== '') {
-        this.attributeBindings = [...this.attributeBindings || [], 'l']; // to avoid mutating the parent definition.
+        this.attributeBindings = ['l', ...this.attributeBindings || []]; // to avoid mutating the parent definition.
       }
     }
   });

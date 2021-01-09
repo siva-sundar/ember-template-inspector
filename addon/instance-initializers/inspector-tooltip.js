@@ -36,11 +36,8 @@ function attachMouseOverListener($tooltip, templateInspectorService) {
       && event.shiftKey
       && target.hasAttribute(locationAttribute)) {
 
-
       let fileInfo = target.getAttribute(locationAttribute);
-      let [,, line, column] = fileInfo.split(':');
-      let { file_name } = await templateInspectorService.getFileInfo(fileInfo);
-      let resolvedLocation = `${file_name}:${line}:${column}`;
+      let resolvedLocation = templateInspectorService.getFileInfo(fileInfo);
 
       target.classList.add('inspector-element-highlight');
       calculateToolTipPosition(event.target, $tooltip, resolvedLocation);
@@ -55,7 +52,8 @@ function attachMouseOutListener($tooltip) {
     if (target.id !== 'inspector'
     && target.hasAttribute(locationAttribute)
     && target.classList.contains('inspector-element-highlight')) {
-      event.target.classList.remove('inspector-element-highlight');
+
+      target.classList.remove('inspector-element-highlight');
       $tooltip.style.display = 'none';
     }
   });

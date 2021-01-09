@@ -21,6 +21,7 @@ function validateAndLoadConfig() {
   }
 }
 
+const fileLocationHash = {};
 let appOrAddonIndex = 1;
 
 module.exports = {
@@ -30,7 +31,7 @@ module.exports = {
     if (!isInspectorEnabled) {
       return;
     }
-    let { fileLocationHash } = this._findHost();
+
     let options = config.options;
 
     let protocol = options.ssl === true ? 'https' : 'http';
@@ -67,21 +68,8 @@ module.exports = {
       }
     });
 
-    config.app.get('/fileinfo', (req, res, next) => {
-      let { file } = req.query;
-      let [appOrAddon, fileIndex] = file.split(':');
-      let filesHash = fileLocationHash[appOrAddon];
-      let fileName;
-
-      if (filesHash) {
-        fileName = filesHash.files[fileIndex];
-      }
-
-      if (fileName) {
-        res.status(200).json({ file_name: fileName });
-      } else {
-        next(new Error('File not found'));
-      }
+    config.app.get('/fileinfo', (req, res) => {
+      res.status(200).json({ file_location_hash: fileLocationHash });
     })
   },
 
@@ -95,7 +83,6 @@ module.exports = {
     let { keywords = [] } = pkg;
     let emberApp = this._findHost();
     let { options } = emberApp;
-    let fileLocationHash = emberApp.fileLocationHash = emberApp.fileLocationHash || {};
     let moduleRootPath, moduleName;
     let files = {};
 
