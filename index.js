@@ -21,6 +21,7 @@ function validateAndLoadConfig() {
   }
 }
 
+const fileLocationHash = {};
 let appOrAddonIndex = 1;
 
 module.exports = {
@@ -30,7 +31,7 @@ module.exports = {
     if (!isInspectorEnabled) {
       return;
     }
-    let { fileLocationHash } = this._findHost();
+
     let options = config.options;
 
     let protocol = options.ssl === true ? 'https' : 'http';
@@ -95,7 +96,6 @@ module.exports = {
     let { keywords = [] } = pkg;
     let emberApp = this._findHost();
     let { options } = emberApp;
-    let fileLocationHash = emberApp.fileLocationHash = emberApp.fileLocationHash || {};
     let moduleRootPath, moduleName;
     let files = {};
 
