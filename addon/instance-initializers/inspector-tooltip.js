@@ -1,12 +1,12 @@
 /* eslint no-inner-declarations: "off"*/
-import Component from '@ember/component';
+import componentExt from '../utils/component-ext';
 
 let isListenerAttached = false;
-const locationAttribute = 'data-loc';
+const locationAttribute = 'l';
 
-function calculateToolTipPosition($element, $tooltip) {
+function calculateToolTipPosition($element, $tooltip, fileName) {
   let elementCoordinates = $element.getBoundingClientRect();
-  $tooltip.innerText = $element.getAttribute(locationAttribute);
+  $tooltip.innerText = fileName;
 
   $tooltip.style.display = 'inline-block';
 
@@ -29,15 +29,21 @@ function calculateToolTipPosition($element, $tooltip) {
 
 }
 
-function attachMouseOverListener($tooltip) {
-  document.body.addEventListener('mouseover', (event) => {
+function attachMouseOverListener($tooltip, templateInspectorService) {
+  document.body.addEventListener('mouseover', async (event) => {
     let { target } = event;
     if (event.altKey
       && event.shiftKey
       && target.hasAttribute(locationAttribute)) {
 
+
+      let fileInfo = target.getAttribute(locationAttribute);
+      let [,, line, column] = fileInfo.split(':');
+      let { file_name } = await templateInspectorService.getFileInfo(fileInfo);
+      let resolvedLocation = `${file_name}:${line}:${column}`;
+
       target.classList.add('inspector-element-highlight');
-      calculateToolTipPosition(event.target, $tooltip);
+      calculateToolTipPosition(event.target, $tooltip, resolvedLocation);
     }
   });
 }
@@ -55,46 +61,44 @@ function attachMouseOutListener($tooltip) {
   });
 }
 
-function attachClickListener($tooltip) {
-  let { serverUrl } = window.emberTemplateInspector || {};
+function attachClickListener($tooltip, templateInspectorService) {
 
-  document.body.addEventListener('click', (event) => {
+  document.body.addEventListener('click', async (event) => {
     let { target } = event;
     if (event.altKey
       && event.shiftKey
       && target.hasAttribute(locationAttribute)) {
-      let file = target.getAttribute(locationAttribute);
+      let fileInfo = target.getAttribute(locationAttribute);
       event.stopPropagation();
       event.preventDefault();
-      fetch(`${serverUrl}/openfile?file=${file}`);
+
+      await templateInspectorService.openFile(fileInfo);
       $tooltip.style.display = 'none';
     }
   });
 }
 
-export function initialize() {
-  if (isListenerAttached) {
-    return;
-  }
-
-  Component.reopen({
-    init() {
-      this._super(...arguments);
-      if (this.tagName !== '') {
-        this.attributeBindings = [...this.attributeBindings || [], 'data-loc']; // to avoid mutating the parent definition.
-      }
-    }
-  });
-
+function createToolTip(templateInspectorService) {
   let $tooltip = document.createElement('div');
 
   $tooltip.classList.add('inspector-tooltip');
   document.body.appendChild($tooltip);
 
-  attachMouseOverListener($tooltip);
-  attachMouseOutListener($tooltip);
-  attachClickListener($tooltip);
+  attachMouseOverListener($tooltip, templateInspectorService);
+  attachMouseOutListener($tooltip, templateInspectorService);
+  attachClickListener($tooltip, templateInspectorService);
 
+}
+
+export function initialize(applicationInstance) {
+  if (isListenerAttached) {
+    return;
+  }
+
+  let templateInspectorService = applicationInstance.lookup('service:template-inspector');
+
+  componentExt();
+  createToolTip(templateInspectorService);
   isListenerAttached = true;
 }
 

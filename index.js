@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const launch = require('launch-editor');
-const FileNamePlugin = require('./lib/file-name-plugin')();
+const FileNamePlugin = require('./lib/file-name-plugin');
 
 const processDir = process.cwd()
 const preferencePath = path.join(processDir, 'template-inspectorrc.json');
@@ -21,7 +21,7 @@ function validateAndLoadConfig() {
   }
 }
 
-const moduleRootPaths = {};
+let appOrAddonIndex = 1;
 
 module.exports = {
   name: require('./package').name,
@@ -30,20 +30,23 @@ module.exports = {
     if (!isInspectorEnabled) {
       return;
     }
-
+    let { fileLocationHash } = this._findHost();
     let options = config.options;
 
     let protocol = options.ssl === true ? 'https' : 'http';
     serverUrl = `${protocol}://localhost:${options.port}`;
 
     config.app.get('/openfile', (req, res, next) => {
+      let filePath;
       let { file } = req.query;
-      let [modulePrefix] = file.split('/');
-      let modulePath = moduleRootPaths[modulePrefix];
-      file = file.replace(`${modulePrefix}/`, '');
+      let [appOrAddon, fileIndex, line, column] = file.split(':');
+      let { moduleName, moduleRootPath, files } = fileLocationHash[appOrAddon];
 
-      let [fileName, line, column] = file.split(':');
-      let filePath = path.join(modulePath, fileName);
+      if (files) {
+        let fileName = files[fileIndex];
+        fileName = fileName.replace(moduleName, '');
+        filePath = path.join(moduleRootPath, fileName);
+      }
 
       try {
         if (fs.existsSync(filePath)) {
@@ -63,6 +66,23 @@ module.exports = {
         next(exception);
       }
     });
+
+    config.app.get('/fileinfo', (req, res, next) => {
+      let { file } = req.query;
+      let [appOrAddon, fileIndex] = file.split(':');
+      let filesHash = fileLocationHash[appOrAddon];
+      let fileName;
+
+      if (filesHash) {
+        fileName = filesHash.files[fileIndex];
+      }
+
+      if (fileName) {
+        res.status(200).json({ file_name: fileName });
+      } else {
+        next(new Error('File not found'));
+      }
+    })
   },
 
   _setupPreprocessorRegistry(app) {
@@ -73,18 +93,29 @@ module.exports = {
     let { parent } = this;
     let { root, pkg } = parent;
     let { keywords = [] } = pkg;
-    let { options } = this._findHost();
+    let emberApp = this._findHost();
+    let { options } = emberApp;
+    let fileLocationHash = emberApp.fileLocationHash = emberApp.fileLocationHash || {};
+    let moduleRootPath, moduleName;
+    let files = {};
 
     if (options.name === app.name && options.trees.app === 'tests/dummy/app') {
-      moduleRootPaths['dummy'] = `${processDir}/tests/dummy/app`;
+      moduleRootPath = `${processDir}/tests/dummy/app`;
+      moduleName = 'dummy';
     } else {
-      let name = typeof parent.name === 'function' ? parent.name() : parent.name;
-      moduleRootPaths[name] = keywords.includes('ember-addon') ? `${root}/addon` : `${root}/app`;
+      moduleRootPath = keywords.includes('ember-addon') ? `${root}/addon` : `${root}/app`;
+      moduleName = typeof parent.name === 'function' ? parent.name() : parent.name;
     }
+
+    fileLocationHash[appOrAddonIndex] = {
+      moduleName,
+      moduleRootPath,
+      files
+    };
 
     registry.add('htmlbars-ast-plugin', {
       name: 'file-name-plugin',
-      plugin: FileNamePlugin,
+      plugin: FileNamePlugin({ appOrAddonIndex: appOrAddonIndex++, fileIndex: 1, files }),
       baseDir() {
         return __dirname;
       }
