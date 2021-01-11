@@ -15,9 +15,9 @@ module('Acceptance | inspector', function(hooks) {
     assert.dom('[data-test-title="addon-title"]').hasAttribute(locationAttribute, '1:3:1:0');
 
     let l = document.querySelector('[data-test-title="addon-title"]').getAttribute('l');
-    let { file_name } = await inspector.getFileInfo(l);
-    let [,, line, column] = l.split(':');
-    assert.equal(`${file_name}:${line}:${column}`, 'dummy/templates/application.hbs:1:0', 'file location is not equal');
+    let fileName = await inspector.getFileInfo(l);
+
+    assert.equal(fileName, 'dummy/templates/application.hbs:1:0', 'file location is not equal');
 
     assert.dom('[data-test-title="application-route"]').hasAttribute(locationAttribute, '1:3:3:0');
 

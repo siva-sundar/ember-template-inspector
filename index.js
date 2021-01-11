@@ -68,21 +68,8 @@ module.exports = {
       }
     });
 
-    config.app.get('/fileinfo', (req, res, next) => {
-      let { file } = req.query;
-      let [appOrAddon, fileIndex] = file.split(':');
-      let filesHash = fileLocationHash[appOrAddon];
-      let fileName;
-
-      if (filesHash) {
-        fileName = filesHash.files[fileIndex];
-      }
-
-      if (fileName) {
-        res.status(200).json({ file_name: fileName });
-      } else {
-        next(new Error('File not found'));
-      }
+    config.app.get('/fileinfo', (req, res) => {
+      res.status(200).json({ file_location_hash: fileLocationHash });
     })
   },
 
