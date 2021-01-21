@@ -14,11 +14,6 @@ module('Acceptance | inspector', function(hooks) {
     //application route
     assert.dom('[data-test-title="addon-title"]').hasAttribute(locationAttribute);
 
-    let l = document.querySelector('[data-test-title="addon-title"]').getAttribute('l');
-    let fileName = await inspector.getFileInfo(l);
-
-    assert.equal(fileName, 'dummy/templates/application.hbs:1:0', 'file location is not equal');
-
     assert.dom('[data-test-title="application-route"]').hasAttribute(locationAttribute);
 
     await click('[href="/classic-route"]');
@@ -39,5 +34,10 @@ module('Acceptance | inspector', function(hooks) {
     //pod component
     assert.dom('[data-test-title="pod-component"]').hasAttribute(locationAttribute)
     assert.dom('[data-test-title="input-statement"]').hasAttribute(locationAttribute)
+
+    let l = document.querySelector('[data-test-title="addon-title"]').getAttribute('l');
+    let fileName = await inspector.getFileInfo(l);
+
+    assert.equal(fileName, 'dummy/templates/application.hbs:1:0', 'file location is not equal');
   });
 });
