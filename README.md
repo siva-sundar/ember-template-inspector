@@ -8,6 +8,9 @@ An ember add-on which opens the template file in the code editor while inspectin
 ### How this works ?
 File locations are added to the html elements during development build and on clicking the element, an api is initiated to the express server which opens the file. This package adds the dev server url to the index.html.
 
+* Ember.js v3.16 or above
+* Ember CLI v2.13 or above
+* Node.js v10 or above
 
 ### Supported editors
 
