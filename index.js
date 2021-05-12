@@ -27,17 +27,19 @@ let appOrAddonIndex = 1;
 module.exports = {
   name: require('./package').name,
 
-  serverMiddleware(config) {
+  serverMiddleware(config,) {
     if (!isInspectorEnabled) {
       return;
     }
 
-    let options = config.options;
+    this.setupAPI(config);
+  },
 
+  setupAPI({ app, options }) {
     let protocol = options.ssl === true ? 'https' : 'http';
     serverUrl = `${protocol}://localhost:${options.port}`;
 
-    config.app.get('/openfile', (req, res, next) => {
+    app.get('/openfile', (req, res, next) => {
       let filePath;
       let { file } = req.query;
       let [appOrAddon, fileIndex, line, column] = file.split(':');
@@ -65,9 +67,13 @@ module.exports = {
       }
     });
 
-    config.app.get('/fileinfo', (req, res) => {
+    app.get('/fileinfo', (req, res) => {
       res.status(200).json({ file_location_hash: fileLocationHash });
     });
+  },
+
+  testemMiddleware(app, options) {
+    this.setupAPI({ app, options });
   },
 
   _setupPreprocessorRegistry(app) {
