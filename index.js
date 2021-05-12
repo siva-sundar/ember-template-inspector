@@ -27,7 +27,7 @@ let appOrAddonIndex = 1;
 module.exports = {
   name: require('./package').name,
 
-  serverMiddleware(config,) {
+  serverMiddleware(config) {
     if (!isInspectorEnabled) {
       return;
     }
