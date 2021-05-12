@@ -1,4 +1,4 @@
-import Component from '@ember/component';
+import Component from '@ember/component'; // eslint-disable-line ember/no-classic-components
 
 export default function () {
   Component.reopen({
