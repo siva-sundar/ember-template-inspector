@@ -38,6 +38,6 @@ module('Acceptance | inspector', function(hooks) {
     let l = document.querySelector('[data-test-title="addon-title"]').getAttribute('l');
     let fileName = await inspector.getFileInfo(l);
 
-    assert.equal(fileName, 'dummy/templates/application.hbs:1:0', 'file location is not equal');
+    assert.equal(fileName, 'dummy/templates/application.hbs:2:0', 'file location is not equal');
   });
 });
