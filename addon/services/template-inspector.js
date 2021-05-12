@@ -10,7 +10,9 @@ export default class TemplateInspectorService extends Service {
   }
 
   async fetchFileInfo() {
-    let { file_location_hash } = await fetch(`${this.serverUrl}/fileinfo`).then(res => res.json());
+    let { file_location_hash } = await fetch(`${this.serverUrl}/fileinfo`).then(
+      (res) => res.json()
+    );
     this.fileLocationHash = file_location_hash;
   }
 

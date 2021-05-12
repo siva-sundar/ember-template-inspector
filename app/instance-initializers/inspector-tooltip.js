@@ -1,1 +1,4 @@
-export { default, initialize } from 'ember-template-inspector/instance-initializers/inspector-tooltip';
+export {
+  default,
+  initialize,
+} from 'ember-template-inspector/instance-initializers/inspector-tooltip';

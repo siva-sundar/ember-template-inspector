@@ -13,29 +13,29 @@ function calculateToolTipPosition($element, $tooltip, fileName) {
   let tooltipCoordinates = $tooltip.getBoundingClientRect();
   let top, left;
 
-  if ((elementCoordinates.top - tooltipCoordinates.height - 8) > 0) {
+  if (elementCoordinates.top - tooltipCoordinates.height - 8 > 0) {
     top = elementCoordinates.top - tooltipCoordinates.height - 8;
   } else {
     top = elementCoordinates.bottom + 12;
   }
 
-  if ((elementCoordinates.left + tooltipCoordinates.width) > window.innerWidth) {
+  if (elementCoordinates.left + tooltipCoordinates.width > window.innerWidth) {
     left = elementCoordinates.right - tooltipCoordinates.width;
   } else {
     left = elementCoordinates.left;
   }
   $tooltip.style.top = `${top}px`;
   $tooltip.style.left = `${left}px`;
-
 }
 
 function attachMouseOverListener($tooltip, templateInspectorService) {
   document.body.addEventListener('mouseover', async (event) => {
     let { target } = event;
-    if (event.altKey
-      && event.shiftKey
-      && target.hasAttribute(locationAttribute)) {
-
+    if (
+      event.altKey &&
+      event.shiftKey &&
+      target.hasAttribute(locationAttribute)
+    ) {
       let fileInfo = target.getAttribute(locationAttribute);
       let resolvedLocation = templateInspectorService.getFileInfo(fileInfo);
 
@@ -49,10 +49,11 @@ function attachMouseOutListener($tooltip) {
   document.body.addEventListener('mouseout', (event) => {
     let { target } = event;
 
-    if (target.id !== 'inspector'
-    && target.hasAttribute(locationAttribute)
-    && target.classList.contains('inspector-element-highlight')) {
-
+    if (
+      target.id !== 'inspector' &&
+      target.hasAttribute(locationAttribute) &&
+      target.classList.contains('inspector-element-highlight')
+    ) {
       target.classList.remove('inspector-element-highlight');
       $tooltip.style.display = 'none';
     }
@@ -60,12 +61,13 @@ function attachMouseOutListener($tooltip) {
 }
 
 function attachClickListener($tooltip, templateInspectorService) {
-
   document.body.addEventListener('click', async (event) => {
     let { target } = event;
-    if (event.altKey
-      && event.shiftKey
-      && target.hasAttribute(locationAttribute)) {
+    if (
+      event.altKey &&
+      event.shiftKey &&
+      target.hasAttribute(locationAttribute)
+    ) {
       let fileInfo = target.getAttribute(locationAttribute);
       event.stopPropagation();
       event.preventDefault();
@@ -85,7 +87,6 @@ function createToolTip(templateInspectorService) {
   attachMouseOverListener($tooltip, templateInspectorService);
   attachMouseOutListener($tooltip, templateInspectorService);
   attachClickListener($tooltip, templateInspectorService);
-
 }
 
 export function initialize(applicationInstance) {
@@ -93,7 +94,9 @@ export function initialize(applicationInstance) {
     return;
   }
 
-  let templateInspectorService = applicationInstance.lookup('service:template-inspector');
+  let templateInspectorService = applicationInstance.lookup(
+    'service:template-inspector'
+  );
 
   componentExt();
   createToolTip(templateInspectorService);
@@ -101,5 +104,5 @@ export function initialize(applicationInstance) {
 }
 
 export default {
-  initialize
+  initialize,
 };

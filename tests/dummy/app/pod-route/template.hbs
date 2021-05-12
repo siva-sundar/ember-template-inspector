@@ -1,16 +1,17 @@
 <h3>
-  <u data-test-title="pod-route-title">
+  <span data-test-title="pod-route-title">
     Pod Route Template
-  </u>
+  </span>
 </h3>
 <div class="container" data-test-title="container">
   <b>Container Element</b>
   <br/>
   <br/>
   <br/>
-  {{pod-component}}
+  <PodComponent/>
   <br/>
   <br/>
   <br/>
-  {{input data-test-title="input-statement"}}
+  {{! template-lint-disable no-bare-strings require-input-label }}
+  <input data-test-title="input-statement"/>
 </div>

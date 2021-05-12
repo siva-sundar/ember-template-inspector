@@ -1,12 +1,12 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
 
-export default function() {
+export default function () {
   Component.reopen({
     init() {
       this._super(...arguments);
       if (this.tagName !== '') {
-        this.attributeBindings = ['l', ...this.attributeBindings || []]; // to avoid mutating the parent definition.
+        this.attributeBindings = ['l', ...(this.attributeBindings || [])]; // to avoid mutating the parent definition.
       }
-    }
+    },
   });
 }

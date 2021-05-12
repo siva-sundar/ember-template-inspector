@@ -5,7 +5,7 @@ const path = require('path');
 const launch = require('launch-editor');
 const FileNamePlugin = require('./lib/file-name-plugin');
 
-const processDir = process.cwd()
+const processDir = process.cwd();
 const preferencePath = path.join(processDir, 'template-inspectorrc.json');
 const isConfigFileExists = fs.existsSync(preferencePath);
 
@@ -54,23 +54,20 @@ module.exports = {
           // If editor is specified in the config, it will try to load it first.
           // Else, it will load any running editor.
           // If there is no running editor, it will fallback to process.env.EDITOR
-          launch(
-            `${filePath}:${line}:${column}`,
-            editor
-          );
+          launch(`${filePath}:${line}:${column}`, editor);
 
           res.send('File opened');
         } else {
           next(new Error('File not found'));
         }
-      } catch(exception) {
+      } catch (exception) {
         next(exception);
       }
     });
 
     config.app.get('/fileinfo', (req, res) => {
       res.status(200).json({ file_location_hash: fileLocationHash });
-    })
+    });
   },
 
   _setupPreprocessorRegistry(app) {
@@ -90,22 +87,29 @@ module.exports = {
       moduleRootPath = `${processDir}/tests/dummy/app`;
       moduleName = 'dummy';
     } else {
-      moduleRootPath = keywords.includes('ember-addon') ? `${root}/addon` : `${root}/app`;
-      moduleName = typeof parent.name === 'function' ? parent.name() : parent.name;
+      moduleRootPath = keywords.includes('ember-addon')
+        ? `${root}/addon`
+        : `${root}/app`;
+      moduleName =
+        typeof parent.name === 'function' ? parent.name() : parent.name;
     }
 
     fileLocationHash[appOrAddonIndex] = {
       moduleName,
       moduleRootPath,
-      files
+      files,
     };
 
     registry.add('htmlbars-ast-plugin', {
       name: 'file-name-plugin',
-      plugin: FileNamePlugin({ appOrAddonIndex: appOrAddonIndex++, fileIndex: 1, files }),
+      plugin: FileNamePlugin({
+        appOrAddonIndex: appOrAddonIndex++,
+        fileIndex: 1,
+        files,
+      }),
       baseDir() {
         return __dirname;
-      }
+      },
     });
   },
 
@@ -122,7 +126,6 @@ module.exports = {
   },
 
   treeFor() {
-
     if (!isInspectorEnabled) {
       return;
     }
@@ -131,8 +134,7 @@ module.exports = {
   },
   contentFor(type) {
     if (type === 'head' && isInspectorEnabled && serverUrl) {
-      return `<script>window.emberTemplateInspector = { serverUrl: '${serverUrl}' }</script>`
+      return `<script>window.emberTemplateInspector = { serverUrl: '${serverUrl}' }</script>`;
     }
-  }
-
+  },
 };
