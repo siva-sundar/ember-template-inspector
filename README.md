@@ -1,4 +1,4 @@
-# ember-template-inspector
+# ember-template-inspector [![Build Status](https://travis-ci.com/siva-sundar/ember-template-inspector.svg?branch=master)](https://travis-ci.com/siva-sundar/ember-template-inspector)
 
 An ember add-on which opens the template file in the code editor while inspecting an element. To open the file, `Press ALT(Option) + SHIFT and Click on the element`.
 
