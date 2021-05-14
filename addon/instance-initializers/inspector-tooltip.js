@@ -78,7 +78,7 @@ function attachClickListener($tooltip, templateInspectorService) {
   });
 }
 
-function createToolTip(templateInspectorService) {
+function createToolTip({ document, templateInspectorService }) {
   let $tooltip = document.createElement('div');
 
   $tooltip.classList.add('inspector-tooltip');
@@ -94,13 +94,17 @@ export function initialize(applicationInstance) {
     return;
   }
 
-  let templateInspectorService = applicationInstance.lookup(
-    'service:template-inspector'
-  );
-
   componentExt();
-  createToolTip(templateInspectorService);
-  isListenerAttached = true;
+  applicationInstance.application.reopen({
+    ready() {
+      this._super(...arguments);
+      let templateInspectorService = applicationInstance.lookup(
+        'service:template-inspector'
+      );
+      createToolTip({ document, templateInspectorService });
+      isListenerAttached = true;
+    },
+  });
 }
 
 export default {

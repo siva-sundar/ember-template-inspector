@@ -1,11 +1,12 @@
 import { module, test } from 'qunit';
-import { visit, currentURL, click } from '@ember/test-helpers';
-import { setupApplicationTest } from 'ember-qunit';
+import { setup, visit } from 'ember-cli-fastboot-testing/test-support';
+import { currentURL } from '@ember/test-helpers';
 import getService from 'dummy/tests/helpers/get-service';
+
 const locationAttribute = 'l';
 
-module('Acceptance | inspector', function (hooks) {
-  setupApplicationTest(hooks);
+module('FastBoot | ember-template-inspector', function (hooks) {
+  setup(hooks);
 
   test('visiting /', async function (assert) {
     await visit('/');
@@ -20,7 +21,7 @@ module('Acceptance | inspector', function (hooks) {
       .dom('[data-test-title="application-route"]')
       .hasAttribute(locationAttribute);
 
-    await click('[href="/classic-route"]');
+    await visit('/classic-route');
 
     //classic route
     assert
@@ -34,7 +35,7 @@ module('Acceptance | inspector', function (hooks) {
       .hasAttribute(locationAttribute);
 
     //pod route
-    await click('[href="/pod-route"]');
+    await visit('/pod-route');
     assert
       .dom('[data-test-title="pod-route-title"]')
       .hasAttribute(locationAttribute);
