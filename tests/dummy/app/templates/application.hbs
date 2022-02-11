@@ -1,6 +1,19 @@
 <h1 id="title" data-test-title="addon-title">Ember Template Inspector</h1>
 <hr>
 <h2 data-test-title="application-route"> Application Route </h2>
+
+{{#if this.someCondition}}
+  <p>If</p>
+{{else}}
+  <p data-test-else>else</p>
+{{/if}}
+
+{{#unless this.someCondition}}
+  <p data-test-unless>Unless</p>
+{{else}}
+  <p>else</p>
+{{/unless}}
+
 <LinkTo @route="classic-route">
   Go to Classic Route
 </LinkTo>
