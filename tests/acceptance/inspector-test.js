@@ -20,6 +20,16 @@ module('Acceptance | inspector', function (hooks) {
       .dom('[data-test-title="application-route"]')
       .hasAttribute(locationAttribute);
 
+    // if..else
+    assert
+      .dom('[data-test-else]')
+      .hasAttribute(locationAttribute);
+
+    // unless..else
+    assert
+      .dom('[data-test-unless]')
+      .hasAttribute(locationAttribute);
+
     await click('[href="/classic-route"]');
 
     //classic route
