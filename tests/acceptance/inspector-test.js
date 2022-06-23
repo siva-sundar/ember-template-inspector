@@ -68,5 +68,11 @@ module('Acceptance | inspector', function (hooks) {
       'dummy/templates/application.hbs:1:0',
       'file location is not equal'
     );
+
+    // yieldable named blocks
+    await visit('/');
+    assert
+      .dom('[data-test-named-yield]')
+      .hasAttribute(locationAttribute);
   });
 });
