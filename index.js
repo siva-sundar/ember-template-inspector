@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const launch = require('launch-editor');
-const FileNamePlugin = require('./lib/file-name-plugin');
+const { buildPlugin } = require('./lib/build-plugin');
 
 const processDir = process.cwd();
 const preferencePath = path.join(processDir, 'template-inspectorrc.json');
@@ -40,16 +40,10 @@ module.exports = {
     serverUrl = `${protocol}://localhost:${options.port}`;
 
     app.get('/openfile', (req, res, next) => {
-      let filePath;
       let { file } = req.query;
-      let [appOrAddon, fileIndex, line, column] = file.split(':');
-      let { moduleName, moduleRootPath, files } = fileLocationHash[appOrAddon];
-
-      if (files) {
-        let fileName = files[fileIndex];
-        fileName = fileName.replace(moduleName, '');
-        filePath = path.join(moduleRootPath, fileName);
-      }
+      let [appOrAddon, fileName, line, column] = file.split(':');
+      let { moduleRootPath } = fileLocationHash[appOrAddon];
+      let filePath = path.join(moduleRootPath, fileName);
 
       try {
         if (fs.existsSync(filePath)) {
@@ -65,10 +59,6 @@ module.exports = {
       } catch (exception) {
         next(exception);
       }
-    });
-
-    app.get('/fileinfo', (req, res) => {
-      res.status(200).json({ file_location_hash: fileLocationHash });
     });
   },
 
@@ -87,7 +77,6 @@ module.exports = {
     let emberApp = this._findHost();
     let { options } = emberApp;
     let moduleRootPath, moduleName;
-    let files = {};
 
     if (options.name === app.name && options.trees.app === 'tests/dummy/app') {
       moduleRootPath = `${processDir}/tests/dummy/app`;
@@ -100,23 +89,14 @@ module.exports = {
         typeof parent.name === 'function' ? parent.name() : parent.name;
     }
 
+
     fileLocationHash[appOrAddonIndex] = {
       moduleName,
-      moduleRootPath,
-      files,
+      moduleRootPath
     };
 
-    registry.add('htmlbars-ast-plugin', {
-      name: 'file-name-plugin',
-      plugin: FileNamePlugin({
-        appOrAddonIndex: appOrAddonIndex++,
-        fileIndex: 1,
-        files,
-      }),
-      baseDir() {
-        return __dirname;
-      },
-    });
+    let params = { moduleName, appOrAddonIndex: appOrAddonIndex++, pluginDir: __dirname };
+    registry.add('htmlbars-ast-plugin', buildPlugin(params));
   },
 
   included(app) {
