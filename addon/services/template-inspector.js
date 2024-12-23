@@ -5,22 +5,10 @@ export default class TemplateInspectorService extends Service {
     super(...arguments);
     let { serverUrl } = window.emberTemplateInspector || {};
     this.serverUrl = serverUrl;
-
-    this.fetchFileInfo();
-  }
-
-  async fetchFileInfo() {
-    let { serverUrl = '' } = this;
-    let { file_location_hash } = await fetch(`${serverUrl}/fileinfo`).then(
-      (res) => res.json()
-    );
-    this.fileLocationHash = file_location_hash;
   }
 
   getFileInfo(fileInfo) {
-    let [appOrAddon, fileIndex, line, column] = fileInfo.split(':');
-    let fileName = this.fileLocationHash[appOrAddon].files[fileIndex];
-
+    let [_, fileName, line, column] = fileInfo.split(':');
     return `${fileName}:${line}:${column}`;
   }
 
